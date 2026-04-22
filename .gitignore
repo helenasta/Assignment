@@ -1,0 +1,14 @@
+# Local files
+.DS_Store
+*.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Quarto
+.quarto
+/.vscode
+/.quarto/
