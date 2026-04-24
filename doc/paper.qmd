@@ -1,11 +1,11 @@
 ---
 title: |
-  | A Minimal Research Project Template
-  | An Illustrative Example in Python
+  | Replicating Dyer, Lang, and Stice-Lawrence (2017):
+  | Trends in 10-K Textual Disclosure
 author:
-  - name: Course Template
-    email: your.name@example.com
-    affiliation: Your University
+  - name: Helena Stadelmayr
+    email: helena.stadelmayr@student.hu-berlin.de
+    affiliation: Humboldt-Universität zu Berlin
 date: last-modified
 date-format: long
 execute:
@@ -13,7 +13,12 @@ execute:
   message: false
   warning: false
 abstract: |
-  | \vfill This paper demonstrates a minimal reproducible Python workflow for class assignments. The project uses a tiny `mtcars` example, but preserves the basic logic of a larger empirical workflow: data are pulled, prepared, analyzed, serialized to disk, and then imported into the paper as prepared results.
+  | \vfill This paper replicates and extends Figure 1, Panel A of Dyer, Lang, 
+  | and Stice-Lawrence (2017), which documents trends in the length of 10-K 
+  | filings submitted to the SEC. Using a sample of 161,291 firm-years from 
+  | EDGAR covering 2000 to 2025, we show that median 10-K length has more than 
+  | doubled from approximately 25,000 words in 2000 to over 60,000 words in 
+  | 2025, consistent with and extending the trend documented in the original paper.
   | \vspace{6cm}
 bibliography: references.bib
 format:
@@ -25,8 +30,7 @@ format:
 fontsize: 11pt
 ident: yes
 header-includes:
-  - \usepackage[nolists]{endfloat}
-  - \usepackage{setspace}\doublespacing
+  - \usepackage{setspace}\onehalfspacing
   - \setlength{\parindent}{4em}
   - \setlength{\parskip}{0em}
   - \usepackage[hang,flushmargin]{footmisc}
@@ -40,117 +44,105 @@ header-includes:
   - \usepackage{csquotes}
   - \usepackage[margin=1in]{geometry}
   - \usepackage{booktabs}
+  - \usepackage{float}
+  - \floatplacement{figure}{H}
+  - \floatplacement{table}{H}
 ---
 
 ```{python}
 #| label: setup
 #| include: false
 
-import pickle
+import pandas as pd
 from pathlib import Path
 from IPython.display import Image, display
 
-results_path = Path("../output/rct-project-template-results.pkl")
-with results_path.open("rb") as results_file:
-    results = pickle.load(results_file)
-
-descriptive_table = results["descriptive_table"]
-scatter_figure_path = (Path("..") / results["scatter_figure_path"]).resolve()
-table_note = results["table_note"]
-highlights = results["highlights"]
-
-
-def render_table(data, note):
-  table_lines = [
-      "\\begin{tabular}[t]{lrrrr}",
-      "\\toprule",
-      " & ".join(str(column) for column in data.columns) + "\\\\",
-      "\\midrule"
-  ]
-
-  for row in data.itertuples(index=False, name=None):
-    rendered_cells = []
-    for value in row:
-      value = value.item() if hasattr(value, "item") else value
-      if isinstance(value, float):
-        rendered_cells.append(f"{value:.1f}")
-      else:
-        rendered_cells.append(str(value))
-    table_lines.append(" & ".join(rendered_cells) + "\\\\")
-
-  table_lines.extend([
-      "\\bottomrule",
-      "\\end{tabular}"
-  ])
-
-  latex_table = [
-    "\\begin{threeparttable}",
-    *table_lines,
-    "\\begin{tablenotes}[flushleft]",
-    "\\setlength{\\labelsep}{0pt}",
-    f"\\item \\emph{{Note}}: {note}",
-    "\\end{tablenotes}",
-    "\\end{threeparttable}"
-  ]
-
-  print("\n".join(latex_table))
+df = pd.read_csv("../data/generated/10k_cleaned.csv")
+summary = pd.read_csv("../output/sample_by_year.csv")
 ```
 
 \pagebreak
 
 # Introduction
 
-This repository is the Python version of a barebones project template for class assignments. It keeps the moving parts of a larger workflow visible while staying small enough to understand in one sitting. Data move through a pull step, a preparation step, an analysis step, and finally into a paper that reads saved results rather than re-running the analytical pipeline. The paper structure is intentionally compact, but it already includes standard scholarly features such as citations and a bibliography [@Wickham2014].
+@Dyer2017 examine trends in 10-K textual disclosure over the period 1996–2013, 
+documenting that annual reports have grown substantially longer, more standardized, 
+and less specific over time.
 
-# Data
-
-The example uses the built-in `mtcars` dataset that ships with `plotnine`. In this template, `code/python/pull_data.py` writes a raw object to `data/pulled/`, `code/python/prep_data.py` creates a prepared analysis dataset in `data/generated/`, and `code/python/run_analysis.py` reads that prepared dataset to create the final analytical objects stored in `output/`.
+# Data and Sample Selection
 
 ```{python}
+#| label: tbl-sample
+#| tbl-cap: Sample description by year
 #| output: asis
-print(
-    f"The prepared sample contains {highlights['sample_size']} observations. "
-    f"Average fuel efficiency is {highlights['avg_mpg']} miles per gallon, "
-    f"average horsepower is {highlights['avg_horsepower']}, and the heaviest "
-    f"vehicle in the sample is {highlights['heaviest_model']}."
-)
+#| tbl-pos: H
+
+table = summary[["year", "n_filings", "median_words"]].copy()
+table.columns = ["Year", "N Filings", "Median Words"]
+table["Year"] = table["Year"].astype(int)
+table["Median Words"] = table["Median Words"].round(0).astype(int)
+
+lines = [
+    "\\begin{threeparttable}",
+    "\\begin{tabular}{lrr}",
+    "\\toprule",
+    " & ".join(table.columns) + " \\\\",
+    "\\midrule"
+]
+for row in table.itertuples(index=False):
+    lines.append(f"{row[0]} & {row[1]:,} & {row[2]:,} \\\\")
+lines += [
+    "\\bottomrule",
+    "\\end{tabular}",
+    "\\begin{tablenotes}[flushleft]",
+    "\\setlength{\\labelsep}{0pt}",
+    "\\item \\emph{Note}: Sample covers 10-K filings from EDGAR, 2000--2025. "
+    "Filings with fewer than 3,000 words and unsuccessful downloads are excluded. "
+    "One filing per firm per year is retained (latest filing date).",
+    "\\end{tablenotes}",
+    "\\end{threeparttable}"
+]
+print("\n".join(lines))
 ```
 
-# Analysis
+## Design Choices
 
-The analysis step estimates a simple linear model of miles per gallon as a function of vehicle weight and transmission type. The goal is not substantive complexity. The goal is to show how a project can separate raw data handling, preparation, analysis, and reporting into distinct scripts that produce durable artifacts.
+The replication follows @Dyer2017 as closely as the provided data allow. 
+The paper covers 1996–2013; our data extend from 2000 to 2025, which we treat 
+as an extension. We exclude years before 2000 because fewer than 500 filings 
+are available per year in 1997–1999, making percentile estimates unreliable. 
+Following the paper, we exclude filings with fewer than 3,000 words. Where a 
+firm has multiple filings in the same fiscal year, we retain the latest filing 
+by filing date. We do not apply a negative market-to-book filter as Compustat 
+data are not available in our dataset.
 
 # Results
 
 ```{python}
-#| label: tbl-summary
-#| tbl-cap: Descriptive statistics by transmission show that manual cars in the prepared sample are lighter and more fuel efficient on average.
-#| output: asis
-render_table(descriptive_table, table_note)
+#| label: fig-length
+#| fig-cap: "10-K length over time. The figure plots the median, 25th, and 75th 
+#|   percentile of word counts for 10-K filings by fiscal year, 2000–2025."
+#| out-width: 95%
+
+display(Image(filename="../output/fig1_panel_a.png"))
 ```
 
-```{python}
-#| label: fig-weight
-#| fig-cap: Fuel efficiency declines with vehicle weight in the prepared sample, with manual cars concentrated among the lighter and more efficient models.
-#| out-width: 85%
-display(Image(filename=str(scatter_figure_path)))
-```
+@fig-length replicates Figure 1, Panel A of @Dyer2017 and extends the 
+sample through 2025. The median word count rises from approximately 25,000 words 
+in 2000 to over 60,000 words in 2025, consistent with the trend documented in 
+the paper. The 75th percentile exceeds 80,000 words by 2025, suggesting that 
+longer filings have become increasingly common.
 
-```{python}
-#| output: asis
-print(
-    f"The fitted model implies a {highlights['weight_slope']} mpg change for "
-    f"an additional 1,000 pounds of vehicle weight. The coefficient on manual "
-    f"transmission is {highlights['manual_effect']} mpg. "
-    f"{highlights['interpretation']}"
-)
-```
+## Comparison with the Published Figure
 
-# Conclusion
-
-This repository is intentionally small, but it is meant to be built on. Students can replace the toy data step, extend the preparation logic, add richer analysis, and continue writing in the same paper structure without changing the overall workflow shape.
-
-A visible placeholder remains here for the in-class GitHub edit if needed: `YOUR NAME – summary`.
+Several differences from the original figure are worth noting. First, our sample 
+starts in 2000 rather than 1996 due to insufficient EDGAR coverage in earlier 
+years. Second, the word counts in our sample are consistently higher than those 
+reported by @Dyer2017, which is expected given that the 10-K parsing method used 
+to generate our data differs from the one used in the paper. Third, our figure 
+shows a visible dip around 2008–2009, likely reflecting the financial crisis. 
+Finally, our sample extends to 2025, showing that the upward trend documented 
+by @Dyer2017 has continued well beyond their sample period.
 
 \pagebreak
 

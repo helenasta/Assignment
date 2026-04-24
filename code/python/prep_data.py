@@ -1,48 +1,44 @@
-from pathlib import Path
-
-import numpy as np
 import pandas as pd
 
+# --- 1. Load raw data ---
+df = pd.read_csv("data/external/10k_word_counts.csv")
 
-INPUT_PATH = Path("data/pulled/mtcars_raw.pkl")
-OUTPUT_PATH = Path("data/generated/mtcars_prepared.pkl")
+# --- 2. Parse dates ---
+df["filing_date"] = pd.to_datetime(df["filing_date"], errors="coerce")
+df["report_date"] = pd.to_datetime(df["report_date"], errors="coerce")
 
+# Extract fiscal year from report_date
+df["year"] = df["report_date"].dt.year
 
-def main() -> None:
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+# --- 3. Sample selection ---
 
-    raw_data = pd.read_pickle(INPUT_PATH)
+# Keep only successful downloads
+df = df[df["download_success"] == True]
 
-    prepared_data = raw_data.assign(
-        transmission=pd.Categorical(
-            np.where(raw_data["am"] == 1, "Manual", "Automatic"),
-            categories=["Automatic", "Manual"],
-            ordered=True,
-        ),
-        cylinders=pd.Categorical(raw_data["cyl"], categories=[4, 6, 8], ordered=True),
-        weight_kg=(raw_data["wt"] * 453.592).round(0).astype(int),
-        efficiency_band=np.where(
-            raw_data["mpg"] >= raw_data["mpg"].median(),
-            "Higher mpg",
-            "Lower mpg",
-        ),
-    )[
-        [
-            "model",
-            "mpg",
-            "hp",
-            "wt",
-            "weight_kg",
-            "cylinders",
-            "transmission",
-            "efficiency_band",
-            "disp",
-            "qsec",
-        ]
-    ]
+# Drop filings before June 1, 1996 (voluntary EDGAR period)
+df = df[df["filing_date"] >= "1996-06-01"]
 
-    prepared_data.to_pickle(OUTPUT_PATH)
+# Keep only years from 2000 onwards (sufficient EDGAR coverage)
+df = df[df["year"] >= 2000]
 
+# Exclude 2026 as the year is not yet complete
+df = df[df["year"] <= 2025]
 
-if __name__ == "__main__":
-    main()
+# Drop filings with fewer than 3,000 words (following Dyer et al.)
+df = df[df["word_count"] >= 3000]
+
+# Drop missing word counts or years
+df = df.dropna(subset=["word_count", "year"])
+
+# Drop duplicate filings: keep one filing per firm (cik) per year
+# (keep the latest filing if multiple exist)
+df = df.sort_values("filing_date")
+df = df.drop_duplicates(subset=["cik", "year"], keep="last")
+
+# --- 4. Save cleaned data ---
+df.to_csv("data/generated/10k_cleaned.csv", index=False)
+
+print(f"Final sample: {len(df)} firm-years, {df['cik'].nunique()} unique firms")
+print(f"Years covered: {int(df['year'].min())} to {int(df['year'].max())}")
+
+print(df.groupby("year")["cik"].count())

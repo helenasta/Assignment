@@ -1,0 +1,48 @@
+\begin{table}[H]
+
+\caption{\label{tbl-sample}Sample description by year}
+
+\centering{
+
+\begin{threeparttable}
+\begin{tabular}{lrr}
+\toprule
+Year & N Filings & Median Words \\
+\midrule
+2000 & 2,308 & 24,868 \\
+2001 & 4,238 & 26,054 \\
+2002 & 5,616 & 30,090 \\
+2003 & 5,261 & 31,694 \\
+2004 & 5,527 & 34,070 \\
+2005 & 5,401 & 37,609 \\
+2006 & 5,609 & 38,700 \\
+2007 & 5,436 & 39,874 \\
+2008 & 7,109 & 34,833 \\
+2009 & 7,391 & 34,531 \\
+2010 & 7,126 & 35,780 \\
+2011 & 6,874 & 37,347 \\
+2012 & 6,701 & 39,135 \\
+2013 & 6,730 & 41,708 \\
+2014 & 6,748 & 44,246 \\
+2015 & 6,673 & 45,833 \\
+2016 & 6,611 & 47,300 \\
+2017 & 6,561 & 50,022 \\
+2018 & 6,474 & 51,972 \\
+2019 & 6,407 & 53,160 \\
+2020 & 6,672 & 55,958 \\
+2021 & 7,429 & 58,107 \\
+2022 & 7,139 & 58,352 \\
+2023 & 6,649 & 59,086 \\
+2024 & 6,392 & 60,006 \\
+2025 & 6,042 & 61,200 \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\setlength{\labelsep}{0pt}
+\item \emph{Note}: Sample covers 10-K filings from EDGAR, 2000--2025. Filings with fewer than 3,000 words and unsuccessful downloads are excluded. One filing per firm per year is retained (latest filing date).
+\end{tablenotes}
+\end{threeparttable}
+
+}
+
+\end{table}

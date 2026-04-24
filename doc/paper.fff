@@ -1,0 +1,13 @@
+\begin{figure}
+
+\caption{\label{fig-length}10-K length over time. The figure plots the
+median, 25th, and 75th percentile of word counts for 10-K filings by
+fiscal year, 2000--2025.}
+
+\centering{
+
+\pandocbounded{\includegraphics[keepaspectratio]{paper_files/figure-pdf/fig-length-output-1.png}}
+
+}
+
+\end{figure}
