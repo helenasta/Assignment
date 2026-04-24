@@ -19,7 +19,7 @@ abstract: |
   | EDGAR covering 2000 to 2025, we show that median 10-K length has more than 
   | doubled from approximately 25,000 words in 2000 to over 60,000 words in 
   | 2025, consistent with and extending the trend documented in the original paper.
-  | \vspace{6cm}
+  \vspace{6cm}
 bibliography: references.bib
 format:
   pdf:
