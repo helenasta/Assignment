@@ -107,14 +107,21 @@ print("\n".join(lines))
 
 ## Design Choices
 
-The replication follows @Dyer2017 as closely as the provided data allow. 
-The paper covers 1996–2013; our data extend from 2000 to 2025, which we treat 
-as an extension. We exclude years before 2000 because fewer than 500 filings 
-are available per year in 1997–1999, making percentile estimates unreliable. 
-Following the paper, we exclude filings with fewer than 3,000 words. Where a 
-firm has multiple filings in the same fiscal year, we retain the latest filing 
-by filing date. We do not apply a negative market-to-book filter as Compustat 
-data are not available in our dataset.
+The replication follows @Dyer2017 as closely as the provided data allow.
+The paper covers 1996–2013; our data extend from 2000 to 2025, which we 
+treat as an extension. We exclude years before 2000 because fewer than 500 
+filings are available per year in 1997–1999, making percentile estimates 
+unreliable. Following the paper, we exclude filings with fewer than 3,000 
+words and retain only successfully downloaded filings. Where a firm has 
+multiple filings in the same fiscal year, we retain the latest filing by 
+filing date.
+
+Several exclusions from the original paper cannot be replicated. First, 
+@Dyer2017 exclude amended filings (10-K/A), small business filings 
+(10-KSB), and 10-K405 filings, but our dataset does not contain filing-type 
+information that would allow us to implement these exclusions. Second, the 
+paper excludes firms with negative market-to-book ratios following 
+@Loughran2014, but Compustat data are not available in our dataset.
 
 # Results
 

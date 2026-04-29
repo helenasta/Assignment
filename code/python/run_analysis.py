@@ -19,18 +19,18 @@ summary.to_csv("output/sample_by_year.csv", index=False)
 # --- 3. Figure 1 Panel A: Word count over time ---
 fig, ax = plt.subplots(figsize=(10, 5))
 
-ax.plot(summary["year"], summary["median_words"], 
-        label="Median", color="black", linewidth=2)
-ax.plot(summary["year"], summary["q1_words"],  
-        label="25th Percentile", color="black", 
-        linewidth=1.5, linestyle="--")
-ax.plot(summary["year"], summary["q3_words"],  
-        label="75th Percentile", color="black", 
-        linewidth=1.5, linestyle=":")
+ax.plot(summary["year"], summary["median_words"],
+        label="Median", color="gray", linewidth=2.5, linestyle="-")
+ax.plot(summary["year"], summary["mean_words"],
+        label="Mean", color="orange", linewidth=2, linestyle="--")
+ax.plot(summary["year"], summary["q1_words"],
+        label="P25", color="gold", linewidth=2, linestyle=":")
+ax.plot(summary["year"], summary["q3_words"],
+        label="P75", color="steelblue", linewidth=2, linestyle="--")
 
 ax.set_xlabel("Year")
 ax.set_ylabel("Number of Words")
-ax.set_title("Figure 1, Panel A: 10-K Length Over Time")
+ax.set_title("Panel A. 10-K Length")
 ax.legend()
 ax.set_ylim(0, None)
 ax.yaxis.set_major_formatter(mticker.FuncFormatter(
@@ -42,5 +42,3 @@ plt.tight_layout()
 plt.savefig("output/fig1_panel_a.pdf")
 plt.savefig("output/fig1_panel_a.png", dpi=150)
 plt.close()
-
-print("Done. Outputs saved to output/")
