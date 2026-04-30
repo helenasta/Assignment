@@ -140,7 +140,7 @@ multiple filings in the same fiscal year, we retain the latest filing by
 filing date.
 
 Several exclusions from the original paper cannot be replicated. First, 
-@Dyer2017 exclude amended filings (10-K/A), small business filings 
+@Dyer2017 exclude amended filings, small business filings 
 (10-KSB), and 10-K405 filings, but our dataset does not contain filing-type 
 information that would allow us to implement these exclusions. Second, the 
 paper excludes firms with negative market-to-book ratios, but Compustat data are not available in our dataset.
