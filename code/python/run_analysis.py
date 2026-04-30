@@ -2,10 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 
-# --- 1. Load cleaned data ---
+# Load cleaned data
 df = pd.read_csv("data/generated/10k_cleaned.csv")
 
-# --- 2. Sample description table ---
+# Sample description table
 summary = df.groupby("year").agg(
     n_filings=("word_count", "count"),
     mean_words=("word_count", "mean"),
@@ -16,7 +16,7 @@ summary = df.groupby("year").agg(
 
 summary.to_csv("output/sample_by_year.csv", index=False)
 
-# --- 3. Figure 1 Panel A: Word count over time ---
+# Figure 1
 fig, ax = plt.subplots(figsize=(10, 5))
 
 ax.plot(summary["year"], summary["median_words"],

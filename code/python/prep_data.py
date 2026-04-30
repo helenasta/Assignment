@@ -1,16 +1,14 @@
 import pandas as pd
 
-# --- 1. Load raw data ---
+# Load data
 df = pd.read_csv("data/external/10k_word_counts.csv")
 
-# --- 2. Parse dates ---
+# Parse dates
 df["filing_date"] = pd.to_datetime(df["filing_date"], errors="coerce")
 df["report_date"] = pd.to_datetime(df["report_date"], errors="coerce")
 
 # Extract fiscal year from report_date
 df["year"] = df["report_date"].dt.year
-
-# --- 3. Sample selection ---
 
 # Keep only successful downloads
 df = df[df["download_success"] == True]
@@ -35,7 +33,7 @@ df = df.dropna(subset=["word_count", "year"])
 df = df.sort_values("filing_date")
 df = df.drop_duplicates(subset=["cik", "year"], keep="last")
 
-# --- 4. Save cleaned data ---
+# Save cleaned data
 df.to_csv("data/generated/10k_cleaned.csv", index=False)
 
 print(f"Final sample: {len(df)} firm-years, {df['cik'].nunique()} unique firms")
