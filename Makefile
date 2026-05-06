@@ -18,16 +18,17 @@ $(PYTHON): pyproject.toml uv.lock .python-version
 
 $(GENERATED): code/python/prep_data.py $(PYTHON)
 	mkdir -p data/generated
-	$(PYTHON) $<
+	$(PYTHON) $
 
 $(RESULTS): code/python/run_analysis.py $(GENERATED) $(PYTHON)
 	mkdir -p output
-	$(PYTHON) $<
+	$(PYTHON) $
 
 $(PAPER): $(SOURCE) $(RESULTS) $(PYTHON)
 	rm -rf .quarto doc/.quarto
-	cd doc && QUARTO_PYTHON=$(QUARTO_PYTHON) $(QUARTO) render paper.qmd --to pdf --output $(PAPER_BASENAME)
-	cp doc/$(PAPER_BASENAME) output/$(PAPER_BASENAME)
+	cd doc && QUARTO_PYTHON=$(QUARTO_PYTHON) $(QUARTO) render paper.qmd --to pdf
+	mkdir -p output
+	mv doc/paper.pdf $(PAPER)
 	rm -f doc/paper.tex doc/paper.log doc/paper.aux doc/paper.out doc/paper.knit.md doc/paper.fff doc/paper.ttt
 
 clean:
