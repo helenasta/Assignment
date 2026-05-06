@@ -18,11 +18,11 @@ $(PYTHON): pyproject.toml uv.lock .python-version
 
 $(GENERATED): code/python/prep_data.py $(PYTHON)
 	mkdir -p data/generated
-	$(PYTHON) $
+	$(PYTHON) $<
 
 $(RESULTS): code/python/run_analysis.py $(GENERATED) $(PYTHON)
 	mkdir -p output
-	$(PYTHON) $
+	$(PYTHON) $<
 
 $(PAPER): $(SOURCE) $(RESULTS) $(PYTHON)
 	rm -rf .quarto doc/.quarto
