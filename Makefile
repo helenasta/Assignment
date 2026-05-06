@@ -5,7 +5,7 @@ QUARTO := quarto
 QUARTO_PYTHON := $(abspath $(PYTHON))
 GENERATED := data/generated/10k_cleaned.csv
 RESULTS := output/fig1_panel_a.png output/sample_by_year.csv
-PAPER_BASENAME := paper.pdf
+PAPER_BASENAME := paper_HelenaStadelmayr.pdf
 PAPER := output/$(PAPER_BASENAME)
 SOURCE := doc/paper.qmd
 
